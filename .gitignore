@@ -1,0 +1,27 @@
+# Ignore existing files in the directory that are not part of the project
+*.pdf
+*solution_notebooks*.ipynb
+data/CO2.csv
+
+# Ignore data downloaded inside Colab / local root
+/data/
+/results/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# VS Code / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# MacOS
+.DS_Store
