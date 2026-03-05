@@ -26,7 +26,7 @@ We dynamically map temporal characteristics to avoid data leakage while capturin
 Tree models drastically reduce RMSE compared to naive and linear models. The Random Forest and XGBoost architectures natively achieve functionally similar performance across bounded cycles definitively isolating repeating behavior.
 
 ## Residual Distribution Analysis
-![Residual Distribution](../results/figures/residual_distribution.png)
+![Residual Distribution](../results/figures/residual_plot.png)
 
 The tree models produce much tighter residual distributions centered near zero accurately mirroring immense variance reduction consistently over regression logic mathematically. 
 
