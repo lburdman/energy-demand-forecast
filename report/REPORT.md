@@ -21,19 +21,19 @@ We dynamically map temporal characteristics to avoid data leakage while capturin
 ---
 
 ## Model Comparison
-![Model Comparison](results/figures/model_comparison.png)
+![Model Comparison](../results/figures/model_comparison.png)
 
 Tree models drastically reduce RMSE compared to naive and linear models. The Random Forest and XGBoost architectures natively achieve functionally similar performance across bounded cycles definitively isolating repeating behavior.
 
 ## Residual Distribution Analysis
-![Residual Distribution](results/figures/residual_distribution.png)
+![Residual Distribution](../results/figures/residual_distribution.png)
 
 The tree models produce much tighter residual distributions centered near zero accurately mirroring immense variance reduction consistently over regression logic mathematically. 
 
 ## Residual Diagnostics
-![Residual ACF](results/figures/residual_acf.png)
-![Residual QQ](results/figures/residual_qq.png)
-![Residual Hist](results/figures/residual_hist.png)
+![Residual ACF](../results/figures/residual_acf.png)
+![Residual QQ](../results/figures/residual_qq.png)
+![Residual Hist](../results/figures/residual_hist.png)
 
 - **ACF Interpretation**: Indicates remaining temporal dependence distinctly bounding specific lags mathematically untouched implicitly showing unmapped momentum.
 - **QQ Plot Interpretation**: Indicates heavy-tailed residual distribution visibly shifting from normally bound central vectors smoothly identifying outlier behaviors.
