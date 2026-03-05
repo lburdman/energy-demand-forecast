@@ -19,21 +19,21 @@ We assess out-of-sample models using standard error limits:
 ## 4. Rolling-Origin Validation
 Unlike random $K$-fold splits, **rolling-origin validation** iteratively trains models up to time $T_k$ and evaluates strictly over the forward window $[T_k, T_{k+W}]$ natively. This mathematically protects against look-ahead temporal leakage systematically matching real-world operational deployments gracefully.
 
-![Rolling-Origin Stability](../results/diagnostics/backtest_rmse_by_fold.png)
+![Rolling-Origin Stability](../results/figures/backtest_rmse_by_fold.png)
 
 ## 5. Residual Diagnostics
 Model residuals ($e_t = y_t - \hat{y}_t$) represent the uncaptured signal within our targets intrinsically. If a model performs perfectly systematically, residuals should resemble a strict Gaussian White Noise sequence cleanly.
 
 ### Ljung-Box & ACF tests
 The **Ljung-Box** test specifically asserts the null hypothesis ($H_0$) that sequence data inherently lacks distinct auto-correlation independently up to lag $k$. A low p-value strongly implies $e_t$ contains cyclic remnants effectively. The **ACF (Auto-Correlation Function)** mathematically charts Pearson's correlations logically mapping the current bound against its shifted histories recursively.
-![Residual ACF](../results/diagnostics/residual_acf.png)
+![Residual ACF](../results/figures/residual_acf.png)
 
 ### Augmented Dickey-Fuller (ADF)
 The **ADF test** determines if the daily aggregated load sequence establishes a unit root functionally ($H_0$: Non-Stationary). Our results confirmed strict stationarity fundamentally keeping long-term tracking strictly valid gracefully.
 
 ### Heavy Tails & Non-Gaussian Distributions
 Plotting a **QQ (Quantile-Quantile)** explicitly maps our theoretical Gaussian bounds against actual residual frequencies structurally. Standard deviations mapping visually away from central axes confirm deep heavy-tail structures conclusively demonstrating outlier behavior inherently resisting regular regression dynamically.
-![Residual QQ](../results/diagnostics/residual_qq.png)
+![Residual QQ](../results/figures/residual_qq.png)
 
 ## 6. Conformal Prediction Intervals
 To explicitly map model uncertainty mathematically accurately, we employ **Conformal Prediction** systematically mapping bounds utilizing absolute errors dynamically calibrating test sets safely:
@@ -43,7 +43,7 @@ To explicitly map model uncertainty mathematically accurately, we employ **Confo
    $$ PI = [\hat{y}_{test} - q, \hat{y}_{test} + q] $$
 
 This process fundamentally guarantees that actual targets logically enter the bounded interval accurately $(1-\alpha)\%$ of the duration implicitly.
-![Prediction Interval Plot](../results/diagnostics/prediction_interval_plot.png)
+![Prediction Interval Plot](../results/figures/prediction_interval_plot.png)
 
 ## 7. Key Statistical Insights
 1. **Electricity demand is dominated by strong daily periodicity:** Demonstrated fundamentally through baseline comparisons safely mimicking core logic intrinsically securely.
