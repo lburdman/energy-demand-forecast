@@ -1,69 +1,58 @@
 # Portfolio Report: Energy Demand Forecasting
 
-## Problem Statement
-The objective of this project is to build a robust, 24-hour ahead electricity demand forecasting model. Accurate load forecasting is critical for grid operations, market bidding, and ensuring stable power supply. We focus on utilizing classical regression and gradient boosting models over deep learning conceptually, optimizing for high interpretability and computational efficiency.
+## 1. Problem Formulation
+The goal is to accurately forecast the aggregate electricity demand $y_{t+h}$ at a future horizon $h=24$ hours given historical observations up to time $t$. We frame this as a supervised regression task mapping a feature matrix $X_t$ to the target variable $y_{t+24}$.
 
-## Dataset
-We utilize the **Open Power System Data (OPSD)** dataset for Germany. The dataset contains high-quality hourly aggregate load data alongside exogenous variables like weather and renewables profiles. After processing and interpolation, the dataset forms a continuous time series suitable for autoregressive modeling.
+## 2. Baseline Model
+The strongest fundamental baseline for daily cyclic data is the Naive equivalent (lag-24), repeating the exact observation from the previous day:
+$$ \hat{y}_{t+24} = y_t $$
 
-## Features Summary
-We dynamically map temporal characteristics to avoid data leakage while capturing inherent demand cycles:
-- **Calendar Features**: Hour, day of the week, month, and a boolean `is_weekend` indicator mapping human behavior cycles.
-- **Lag Features**: Auto-regressive values from $t-1$, $t-24$, and $t-168$ (1 week) past limits.
-- **Rolling Windows**: 24-hour and 168-hour moving averages and standard deviations securely shifted (via `shift(1)`) to preserve chronological boundaries.
+## 3. Evaluation Metrics
+We assess out-of-sample models using standard error limits:
+1. **RMSE (Root Mean Squared Error):** Heavily penalizes large variance natively.
+   $$ RMSE = \sqrt{ \frac{1}{n} \sum_{i} (y_i - \hat{y}_i)^2 } $$
+2. **MAE (Mean Absolute Error):** Measures absolute bounds linearly.
+   $$ MAE = \frac{1}{n} \sum_{i} |y_i - \hat{y}_i| $$
+3. **MAPE (Mean Absolute Percentage Error):** Proportional mapping of accuracy natively.
+   $$ MAPE = \frac{1}{n} \sum_{i} \frac{|y_i - \hat{y}_i|}{y_i} $$
 
-## Models Evaluated
-- **Naive (Lag-24)**: A fundamental robust baseline mimicking the exact demand from 24 hours prior.
-- **Ridge Regression**: A fast, linearly scaled parametric baseline establishing fundamental correlations natively.
-- **Random Forest**: An ensemble bag mapping robust tree bounds minimizing high variance natively.
-- **XGBoost (Selected)**: Gradient-boosted structured mapping handling non-linear cyclic behaviors with minimal latency directly on CPU explicitly optimized across histogram bounds.
+## 4. Rolling-Origin Validation
+Unlike random $K$-fold splits, **rolling-origin validation** iteratively trains models up to time $T_k$ and evaluates strictly over the forward window $[T_k, T_{k+W}]$ natively. This mathematically protects against look-ahead temporal leakage systematically matching real-world operational deployments gracefully.
 
----
+![Rolling-Origin Stability](../results/diagnostics/backtest_rmse_by_fold.png)
 
-## Model Comparison
-![Model Comparison](../results/figures/model_comparison.png)
+## 5. Residual Diagnostics
+Model residuals ($e_t = y_t - \hat{y}_t$) represent the uncaptured signal within our targets intrinsically. If a model performs perfectly systematically, residuals should resemble a strict Gaussian White Noise sequence cleanly.
 
-Tree models drastically reduce RMSE compared to naive and linear models. The Random Forest and XGBoost architectures natively achieve functionally similar performance across bounded cycles definitively isolating repeating behavior.
+### Ljung-Box & ACF tests
+The **Ljung-Box** test specifically asserts the null hypothesis ($H_0$) that sequence data inherently lacks distinct auto-correlation independently up to lag $k$. A low p-value strongly implies $e_t$ contains cyclic remnants effectively. The **ACF (Auto-Correlation Function)** mathematically charts Pearson's correlations logically mapping the current bound against its shifted histories recursively.
+![Residual ACF](../results/diagnostics/residual_acf.png)
 
-## Residual Distribution Analysis
-![Residual Distribution](../results/figures/residuals_plot.png)
+### Augmented Dickey-Fuller (ADF)
+The **ADF test** determines if the daily aggregated load sequence establishes a unit root functionally ($H_0$: Non-Stationary). Our results confirmed strict stationarity fundamentally keeping long-term tracking strictly valid gracefully.
 
-The tree models produce much tighter residual distributions centered near zero accurately mirroring immense variance reduction consistently over regression logic mathematically. 
+### Heavy Tails & Non-Gaussian Distributions
+Plotting a **QQ (Quantile-Quantile)** explicitly maps our theoretical Gaussian bounds against actual residual frequencies structurally. Standard deviations mapping visually away from central axes confirm deep heavy-tail structures conclusively demonstrating outlier behavior inherently resisting regular regression dynamically.
+![Residual QQ](../results/diagnostics/residual_qq.png)
 
-## Residual Diagnostics
-![Residual ACF](../results/figures/residual_acf.png)
-![Residual QQ](../results/figures/residual_qq.png)
-![Residual Hist](../results/figures/residual_hist.png)
+## 6. Conformal Prediction Intervals
+To explicitly map model uncertainty mathematically accurately, we employ **Conformal Prediction** systematically mapping bounds utilizing absolute errors dynamically calibrating test sets safely:
+1. Calibrate empirical absolute residuals: $|e_{cal}| = |y_{cal} - \hat{y}_{cal}|$ natively.
+2. Calculate quantile limits mapping explicitly: $q = \text{Quantile}_{1-\alpha}(|e_{cal}|)$ logically representing error confidence recursively.
+3. Formulate the explicit Prediction Interval dynamically: 
+   $$ PI = [\hat{y}_{test} - q, \hat{y}_{test} + q] $$
 
-- **ACF Interpretation**: Indicates remaining temporal dependence distinctly bounding specific lags mathematically untouched implicitly showing unmapped momentum.
-- **QQ Plot Interpretation**: Indicates heavy-tailed residual distribution visibly shifting from normally bound central vectors smoothly identifying outlier behaviors.
-- **Interpretation Conclusion**: Essentially, the forecast errors are inherently not Gaussian dynamically implying non-linear shifts.
+This process fundamentally guarantees that actual targets logically enter the bounded interval accurately $(1-\alpha)\%$ of the duration implicitly.
+![Prediction Interval Plot](../results/diagnostics/prediction_interval_plot.png)
 
----
+## 7. Key Statistical Insights
+1. **Electricity demand is dominated by strong daily periodicity:** Demonstrated fundamentally through baseline comparisons safely mimicking core logic intrinsically securely.
+2. **Tree-based models capture nonlinear demand dynamics better than linear models:** Both Random Forest and XGBoost map steep boundaries accurately producing tighter structural metrics than standard ridge regression logically correctly.
+3. **Residual autocorrelation suggests missing exogenous drivers:** Low Ljung-Box properties organically suggest distinct physical causal missing variables selectively unmapped systematically.
+4. **Forecast errors concentrate during ramp periods and peak demand hours:** Sharp variations systematically break static mappings heavily.
+5. **Residuals exhibit heavy tails, indicating extreme demand events:** Non-Gaussian spreads consistently prove that outliers naturally escape traditional tree mapping selectively forming unpredictable spikes intuitively smoothly.
 
-## Key Results
-Both singular chronological splits and 5-fold rolling-origin backtesting methodologies confirmed stable findings:
-- Tree-based models drastically outperform simple linear algorithms.
-- XGBoost consistently achieves the lowest Error bounds across all folds securely.
-- The 5-fold backtest confirmed stable boundaries gracefully avoiding temporal overfitting limits implicitly.
-
-*(Note: Exact metrics are dynamically populated in `results/diagnostics/backtest_metrics.csv` and `results/model_metrics.csv`)*
-
-## Error Segmentation (Interpretability)
-- **Error Segmentation**: Our worst predictions systematically spike on extreme boundaries correctly reflecting that standard calendar mappings intrinsically lack distinct holiday signals cleanly.
-
-## Uncertainty Bound Calculation
-We utilized **Conformal Prediction Intervals** safely abstracting limits universally drawing accurate 95% empirical bounds natively covering test validations reliably correctly demonstrating coverage metrics natively.
-
-## Key Insights
-
-1. **Electricity demand is dominated by strong daily periodicity.** Mapping a linear baseline accurately predicts basic cycles, but requires deep models for volatile spikes natively.
-2. **Tree-based models capture nonlinear demand dynamics better than linear models.** They distinctly parse and bind cyclical deviations avoiding strict functional shapes dynamically.
-3. **Residual autocorrelation suggests missing exogenous drivers such as temperature or holidays.** Missing causal features intrinsically bound lagging outputs cleanly tracking structural unmapped parameters visually.
-4. **Forecast errors concentrate during ramp periods and peak demand hours.** Transitions into peak cyclical spaces organically deviate dramatically producing high uncertainty logic automatically.
-5. **Residuals exhibit heavy tails, indicating extreme demand events.** Major shifts naturally fall beyond standard predictive bounding naturally forming abnormal boundaries inherently unpredictable.
-
-## Limitations & Future Work
-- **Holidays & Special Events**: Injecting a holiday calendar explicitly bounded across regional configurations.
-- **Quantile Regression**: Natively adopting distinct quantile losses natively predicting structural deviations universally.
-- **Temperature Exogenous Models**: Adding deep non-linear lagged temperature interactions explicitly.
+## 8. Limitations & Future Work
+We intend to extend fundamental inputs structurally driving correlation limits further effectively:
+- Formulating a distinct Holiday Calendar explicitly mapping distinct cycle-breaks gracefully mapping out standard cyclical behaviors successfully logically.
+- Expanding into deep probabilistic structures evaluating true **Quantile Regression** architectures mapping asymmetric penalizations perfectly accurately gracefully.

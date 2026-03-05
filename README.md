@@ -1,77 +1,72 @@
-# Energy Demand Forecasting with Machine Learning
+# ⚡ Energy Demand Forecasting with Machine Learning
 
-A machine learning pipeline for 24-hour ahead electricity demand forecasting using the Open Power System Data dataset.
+**A portfolio-grade machine learning project implementing a robust 24-hour ahead electricity demand forecasting pipeline using the Open Power System Data (OPSD).**
 
-## 1. Project Overview
-This project addresses the **electricity demand forecasting problem**, which is critical for energy systems to ensure stable power supply, optimize grid operations, and facilitate market bidding. The primary goal is to predict the next-day load (24-hour ahead) accurately, enabling efficient resource allocation.
+## 📖 Project Overview
+This project tackles the **electricity demand forecasting problem**, targeting stable power delivery via accurate predictive scaling. The objective is to construct a **24-hour ahead** load forecast minimizing standard error limits against extremely volatile, non-linear sequences dynamically responding to cyclic shifts securely.
 
-## 2. Dataset
-We utilize the **Open Power System Data (Germany)**, which provides high-quality, hourly electricity demand data alongside renewable generation signals and weather profiles. It contains several years of historical data, making it ideal for robust time series forecasting.
-- [Link to OPSD Dataset](https://data.open-power-system-data.org/)
+## 📊 Dataset
+We natively utilize the high-quality **Open Power System Data (Germany)** framework. The dataset provides multiple years of historical hourly electricity demand alongside renewable generation bounds forming ideal conditions for complex autoregressive time-series structures.
+- [View the OPSD Dataset](https://data.open-power-system-data.org/)
 
-## 3. Feature Engineering
-Our pipeline systematically constructs autoregressive and temporal features to capture cyclical patterns natively without data leakage.
+## ⚙️ Feature Engineering
+We natively avoid data leakage dynamically predicting the following boundaries without future overlaps:
+- **Calendar Features**: `hour`, `day_of_week`, `month`, and boolean `is_weekend` mapping basic human cycles natively.
+- **Lag Features**: Auto-regressive values from $t-1$, $t-24$, and $t-168$ past boundaries. `lag-24` inherently predicts daily repeating patterns intuitively.
+- **Rolling Features**: Calculating moving momentum `mean` and `std` boundaries for 24h & 168h windows securely shifted by `t-1`.
 
-- **Calendar features**: `hour`, `day_of_week`, `month`, `is_weekend` to capture human behavior cycles.
-- **Lag features**: `t-1`, `t-24`, `t-168` (one week prior) representing past bounds. *The lag_24 feature natively captures strict daily seasonality.*
-- **Rolling statistics**: `24h mean` and `168h mean` to estimate broader momentum trends.
-
-## 4. Models Evaluated
-The following architectures were benchmarked against out-of-sample data:
+## 🤖 Models Evaluated
 - **Naive baseline (lag 24)**
-- **Ridge regression**
+- **Ridge Regression**
 - **Random Forest**
-- **XGBoost**
+- **XGBoost (Selected Model)**
 
-Tree-based models drastically outperform linear models precisely because they correctly capture nonlinear demand dynamics effectively.
+## 📈 Results Preview & Key Findings
 
-## 5. Key Results
+### 1. Daily Seasonality Dominates
 ![Prediction vs Actual](results/figures/prediction_vs_actual.png)
+The models inherently learn that strong daily cycles map the majority of the predictive weight dynamically scaling with peak loads accurately.
 
-The model seamlessly captures daily demand cycles and accurately matches peak demand patterns, indicating robust autoregressive logic mapping without degrading.
+### 2. Nonlinearity Outperforms Linear Mapping
+Tree models (XGBoost/RF) drastically outperform the Naive baseline and the Ridge regression mapping complex, non-linear interactions accurately across changing conditions safely without over-fitting limitations.
 
-## 6. Model Robustness
-![Backtest RMSE by Fold](results/figures/backtest_rmse_by_fold.png)
+### 3. Stability Across Rolling-Origin Backtesting
+![Backtest RMSE by Fold](results/diagnostics/backtest_rmse_by_fold.png)
+Using robust rolling-origin validation, we mapped sequential fold tests securely verifying structural accuracy remains completely tight and completely stable without unmapped degradation randomly gracefully.
 
-Using **rolling-origin validation**, we iteratively trained and tested our models across 5 distinct chronological folds natively, proving that errors remained tightly bounded against structural over-fitting limits over unobserved future periods.
+### 4. Ramp & Peak Error Concentrations
+![Error by Hour](results/diagnostics/error_by_hour.png)
+Predictive limits mathematically suffer inherently around rapidly shifting peak cycles intuitively demonstrating inherent tracking latency across steep ramp periods logically.
 
-## 7. Prediction Uncertainty
-![Prediction Interval Plot](results/figures/prediction_interval_plot.png)
+### 5. Uncertainty Modeling via Conformal Prediction
+![Prediction Interval Plot](results/diagnostics/prediction_interval_plot.png)
+Residual matrices inherently map heavy-tailed non-Gaussian logic cleanly justifying safe Conformal Prediction interval tracking dynamically outputting an implicit 95% uncertainty scaling logically surrounding limits effectively.
 
-We calculated **conformal prediction intervals** guaranteeing explicit uncertainty bounded confidence implicitly covering 95% of expected variances logically tracking native test-set behavior gracefully.
+## 💻 Run the Dashboard
+A fast native Python web application charting the predictions interactively!
+```bash
+pip install -r requirements.txt
+streamlit run dashboard/app.py
+```
 
-## 8. Error Analysis
-![Error by Hour](results/figures/error_by_hour.png)
-
-Errors consistently spike selectively along structural boundaries, notably demonstrating ramp-period forecasting difficulty, where load dynamically pivots steeply between cyclical phases.
-
-## 9. Repository Structure
+## 📁 Repository Structure
 ```text
 ├── README.md
 ├── requirements.txt
 ├── report/
-│   └── REPORT.md               
+│   └── REPORT.md               <-- Concise project paper
 ├── dashboard/
-│   └── app.py                  
-├── notebooks/                  
-│   ├── 01_data_exploration.ipynb
-│   ├── 02_feature_engineering.ipynb
-│   ├── 03_modeling.ipynb
-│   ├── 04_interpretability_diagnostics.ipynb
-│   └── 05_statistical_validation.ipynb
+│   └── app.py                  <-- Streamlit interactive dashboard
+├── notebooks/                  <-- Core Colab pipeline (01-05)
 └── src/                        
-    ├── data_loader.py          
-    ├── diagnostics.py          
-    ├── features.py             
-    ├── models.py               
-    └── validation.py           
+    ├── data_loader.py          <-- Data ingestion 
+    ├── diagnostics.py          <-- Error plotting
+    ├── features.py             <-- Feature engineering mappings
+    ├── models.py               <-- Baseline architectures
+    └── validation.py           <-- Backtest/Conformal logic
 ```
 
-## 10. Reproducibility
-The notebooks are built organically to execute flawlessly inside **Google Colab**. 
-Simply upload the notebooks, specify your Google Drive persistent path inside `notebooks/01_data_exploration.ipynb`, and run sequence `01` to `05` natively avoiding local dependency issues explicitly.
-
-## 11. Future Work
-- Injecting detailed **temperature features** implicitly driving correlation.
-- Incorporating a formal **holiday calendar** adjusting boundaries logically across cyclical dates.
-- Shifting directly towards **quantile regression** metrics actively calculating native non-parametric boundaries dynamically natively.
+## 🚀 Future Work
+- Implementing structured **Holiday Calendars** bounding deviations.
+- Integrating highly complex **Temperature/Exogenous features**.
+- Experimenting natively with **Quantile Regression** evaluating direct probabilistic outputs securely natively.

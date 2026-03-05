@@ -5,5 +5,5 @@ scikit-learn
 xgboost
 statsmodels
 seaborn
-pyarrow
+plotly
 streamlit

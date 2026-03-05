@@ -3,76 +3,137 @@ import pandas as pd
 import numpy as np
 import os
 from PIL import Image
+import plotly.graph_objects as go
 
 st.set_page_config(layout="wide", page_title="Energy Demand Forecast")
+
+# Header
 st.title("⚡ Energy Demand Forecast Dashboard")
+st.markdown("This dashboard presents the results of a 24-hour ahead electricity demand forecasting model using Open Power System Data (OPSD) for Germany. It compares advanced tree-based architectures against naive and linear baselines.")
 
-# Paths
-DRIVE_ROOT = "/content/drive/MyDrive/energy-demand-forecast"
-if os.path.exists(DRIVE_ROOT):
-    RESULTS_DIR = os.path.join(DRIVE_ROOT, "results")
-else:
-    RESULTS_DIR = "results"
-
+# Path Setup (Relative for Streamlit Cloud)
+RESULTS_DIR = "results"
+FIG_DIR = os.path.join(RESULTS_DIR, "figures")
 DIAG_DIR = os.path.join(RESULTS_DIR, "diagnostics")
 
-st.markdown("This dashboard presents the results of the 24h-ahead energy demand forecasting model using Open Power System Data (OPSD) for Germany.")
+# 1. Forecast Explorer
+st.header("Forecast Explorer (28-Day Sample)")
+preds_path = os.path.join(RESULTS_DIR, "predictions_sample.csv")
 
-# Model Metrics
-st.subheader("Model Performance (Rolling-Origin Backtest)")
-backtest_path = os.path.join(DIAG_DIR, "backtest_metrics.csv")
-if os.path.exists(backtest_path):
-    df_metrics = pd.read_csv(backtest_path)
-    avg_metrics = df_metrics.groupby("model")[["RMSE", "MAE", "MAPE"]].mean().reset_index()
-    st.dataframe(avg_metrics.style.highlight_min(subset=["RMSE", "MAE", "MAPE"], color='lightgreen', axis=0))
-else:
-    st.info(f"Backtest metrics not found at {backtest_path}. Please run Checkpoint 5 notebook.")
-
-# Interactive Plot
-st.subheader("Actual vs. Predicted Load")
-preds_path = os.path.join(RESULTS_DIR, "predictions.parquet")
 if os.path.exists(preds_path):
-    preds_df = pd.read_parquet(preds_path)
+    df_preds = pd.read_csv(preds_path)
+    df_preds['timestamp'] = pd.to_datetime(df_preds['timestamp'])
     
-    # Ensure index is datetime
-    if not pd.api.types.is_datetime64_any_dtype(preds_df.index):
-        if 'timestamp' in preds_df.columns:
-            preds_df['timestamp'] = pd.to_datetime(preds_df['timestamp'])
-            preds_df.set_index('timestamp', inplace=True)
-        else:
-            preds_df.index = pd.to_datetime(preds_df.index)
-            
-    min_date = preds_df.index.min().date()
-    max_date = preds_df.index.max().date()
+    min_date = df_preds['timestamp'].min().date()
+    max_date = df_preds['timestamp'].max().date()
     
     date_range = st.date_input("Select Date Range", value=[min_date, max_date], min_value=min_date, max_value=max_date)
     
     if len(date_range) == 2:
         start_date, end_date = date_range
-        mask = (preds_df.index.date >= start_date) & (preds_df.index.date <= end_date)
-        filtered_df = preds_df.loc[mask]
+        mask = (df_preds['timestamp'].dt.date >= start_date) & (df_preds['timestamp'].dt.date <= end_date)
+        df_filtered = df_preds.loc[mask]
         
-        st.line_chart(filtered_df)
+        fig = go.Figure()
+        
+        # Actual Load
+        fig.add_trace(go.Scatter(x=df_filtered['timestamp'], y=df_filtered['actual'], 
+                                 mode='lines', name='Actual Load', line=dict(color='black', width=2)))
+        
+        # XGBoost Prediction
+        fig.add_trace(go.Scatter(x=df_filtered['timestamp'], y=df_filtered['xgb_prediction'], 
+                                 mode='lines', name='XGBoost Prediction', line=dict(color='blue', dash='dash')))
+        
+        # Conformal Prediction Intervals
+        if not df_filtered['lower_PI'].isna().all() and not df_filtered['upper_PI'].isna().all():
+            fig.add_trace(go.Scatter(
+                x=pd.concat([df_filtered['timestamp'], df_filtered['timestamp'][::-1]]),
+                y=pd.concat([df_filtered['upper_PI'], df_filtered['lower_PI'][::-1]]),
+                fill='toself',
+                fillcolor='rgba(0, 0, 255, 0.2)',
+                line=dict(color='rgba(255,255,255,0)'),
+                hoverinfo="skip",
+                name='95% Prediction Interval'
+            ))
+            
+        fig.update_layout(height=500, xaxis_title="Date", yaxis_title="Load (MW)", hovermode="x unified")
+        st.plotly_chart(fig, use_container_width=True)
 else:
-    st.info(f"Predictions file not found at {preds_path}.")
+    st.warning(f"Prediction sample file not found at '{preds_path}'. Please ensure Checkpoint 5 has been fully executed.")
 
 st.markdown("---")
 
-# Layout for plots
-col1, col2 = st.columns(2)
+# 2. Metrics
+st.header("Model Performance")
+col_m1, col_m2 = st.columns(2)
 
-with col1:
-    st.subheader("Error by Hour")
-    hour_img_path = os.path.join(DIAG_DIR, "error_by_hour.png")
-    if os.path.exists(hour_img_path):
-        st.image(Image.open(hour_img_path), use_container_width=True)
+with col_m1:
+    st.subheader("Holdout Test Metrics")
+    metrics_path = os.path.join(RESULTS_DIR, "model_metrics.csv")
+    if os.path.exists(metrics_path):
+        df_metrics = pd.read_csv(metrics_path)
+        st.dataframe(df_metrics.style.highlight_min(subset=["RMSE", "MAE", "MAPE"], color='lightgreen', axis=0), use_container_width=True)
     else:
-        st.info("Error by hour plot not found.")
+        st.info("Holdout metrics not found.")
 
-with col2:
-    st.subheader("Prediction Intervals (95%)")
-    pi_img_path = os.path.join(DIAG_DIR, "prediction_interval_plot.png")
-    if os.path.exists(pi_img_path):
-        st.image(Image.open(pi_img_path), use_container_width=True)
+with col_m2:
+    st.subheader("Rolling-Origin Backtest Metrics (Aggregated)")
+    backtest_path = os.path.join(DIAG_DIR, "backtest_metrics.csv")
+    if os.path.exists(backtest_path):
+        df_bt = pd.read_csv(backtest_path)
+        df_bt_agg = df_bt.groupby("model")[["RMSE", "MAE", "MAPE"]].mean().reset_index()
+        st.dataframe(df_bt_agg.style.highlight_min(subset=["RMSE", "MAE", "MAPE"], color='lightgreen', axis=0), use_container_width=True)
     else:
-        st.info("Prediction interval plot not found.")
+        st.info("Backtest metrics not found.")
+
+st.markdown("---")
+
+# 3. Key Figures
+st.header("Key Analytical Figures")
+col_f1, col_f2 = st.columns(2)
+
+def safe_image(path, caption):
+    if os.path.exists(path):
+        st.image(Image.open(path), caption=caption, use_container_width=True)
+    else:
+        st.info(f"Figure not found: {os.path.basename(path)}")
+        
+with col_f1:
+    safe_image(os.path.join(FIG_DIR, "prediction_vs_actual.png"), "Prediction vs Actual")
+    safe_image(os.path.join(DIAG_DIR, "prediction_interval_plot.png"), "Conformal Prediction Intervals")
+
+with col_f2:
+    safe_image(os.path.join(DIAG_DIR, "backtest_rmse_by_fold.png"), "RMSE Stability across Folds")
+    safe_image(os.path.join(DIAG_DIR, "error_by_hour.png"), "Absolute Error mapped by Hour")
+
+# Expander for Diagnostics
+with st.expander("View Extended Residual Diagnostics"):
+    col_e1, col_e2 = st.columns(2)
+    with col_e1:
+        safe_image(os.path.join(DIAG_DIR, "residual_acf.png"), "Auto-Correlation Function")
+        safe_image(os.path.join(DIAG_DIR, "residual_hist.png"), "Residual Histogram")
+        safe_image(os.path.join(DIAG_DIR, "model_comparison.png"), "Model Comparison Barplots")
+    with col_e2:
+        safe_image(os.path.join(DIAG_DIR, "residual_qq.png"), "Quantile-Quantile (QQ) Plot")
+        safe_image(os.path.join(DIAG_DIR, "residuals_plot.png"), "Residual Time Series")
+
+st.markdown("---")
+
+# 4. Statistical Tests & Worst Days
+col_s1, col_s2 = st.columns(2)
+
+with col_s1:
+    st.subheader("Statistical Tests")
+    stat_path = os.path.join(DIAG_DIR, "stat_tests.csv")
+    if os.path.exists(stat_path):
+        st.dataframe(pd.read_csv(stat_path), use_container_width=True)
+    else:
+        st.info("Statistical test results not found.")
+
+with col_s2:
+    st.subheader("Top Worst Prediction Days")
+    worst_path = os.path.join(DIAG_DIR, "worst_days.csv")
+    if os.path.exists(worst_path):
+        st.dataframe(pd.read_csv(worst_path), use_container_width=True)
+    else:
+        st.info("Worst days log not found.")
