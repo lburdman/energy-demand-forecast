@@ -2,6 +2,7 @@
 *.pdf
 *solution_notebooks*.ipynb
 data/CO2.csv
+*.parquet
 
 # Ignore data downloaded inside Colab / local root
 /data/
@@ -12,6 +13,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
+gen_notebook.py
 
 # Jupyter Notebook
 .ipynb_checkpoints

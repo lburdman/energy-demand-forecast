@@ -1,0 +1,3 @@
+test,statistic,pvalue,interpretation
+Ljung-Box (lags=24),52907.319453906406,0.0,Significant autocorrelation remains
+Augmented Dickey-Fuller,-4.58957191493236,0.00013500867210484117,Time series is stationary
