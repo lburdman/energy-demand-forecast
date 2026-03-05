@@ -17,7 +17,9 @@ To reproduce this project, please follow these steps:
    %cd energy-demand-forecast
    ```
    *Note: Replace `<USERNAME>` with your GitHub username if you fork the repository.*
-4. **Run Notebooks:** Open `notebooks/01_data_exploration.ipynb` and run it top-to-bottom. The notebooks are designed to run cleanly without manual intervention.
+4. **Run Notebooks:** 
+   - Open `notebooks/01_data_exploration.ipynb` and run it top-to-bottom for Data Extraction and basic EDA.
+   - Open `notebooks/02_feature_engineering.ipynb` and run it top-to-bottom to build structural models, outputting processed target structures natively matching predictive pipelines natively towards Google Drive parquets.
 
 ## Data and Figures Storage
 
