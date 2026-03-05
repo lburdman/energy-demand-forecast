@@ -12,7 +12,7 @@ st.title("⚡ Energy Demand Forecast Dashboard")
 st.markdown("This dashboard presents the results of a 24-hour ahead electricity demand forecasting model using Open Power System Data (OPSD) for Germany. It compares advanced tree-based architectures against naive and linear baselines.")
 
 # Path Setup (Relative for Streamlit Cloud)
-RESULTS_DIR = "results"
+RESULTS_DIR = "../results"
 FIG_DIR = os.path.join(RESULTS_DIR, "figures")
 DIAG_DIR = os.path.join(RESULTS_DIR, "diagnostics")
 
