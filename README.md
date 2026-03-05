@@ -1,5 +1,7 @@
 # ⚡ Energy Demand Forecasting with Machine Learning
 
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://energy-demand-forecast.streamlit.app)
+
 **A portfolio-grade machine learning project implementing a robust 24-hour ahead electricity demand forecasting pipeline using the Open Power System Data (OPSD).**
 
 ## 📖 Project Overview

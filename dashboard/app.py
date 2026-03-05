@@ -121,21 +121,32 @@ with st.expander("View Extended Residual Diagnostics"):
 
 st.markdown("---")
 
+st.markdown("---")
+
 # 4. Statistical Tests & Worst Days
+st.header("Deep Analytics")
 col_s1, col_s2 = st.columns(2)
 
 with col_s1:
-    st.subheader("Statistical Tests")
-    stat_path = DIAG_DIR / "stat_tests.csv"
-    if stat_path.exists():
-        st.dataframe(pd.read_csv(stat_path), use_container_width=True)
-    else:
-        st.info("Statistical test results not found.")
+    with st.expander("🔍 View Statistical Tests", expanded=False):
+        stat_path = DIAG_DIR / "stat_tests.csv"
+        if stat_path.exists():
+            st.dataframe(pd.read_csv(stat_path), use_container_width=True)
+            st.caption("P-values < 0.05 indicate rejection of the null hypothesis (e.g., stationary data, presence of autocorrelation).")
+        else:
+            st.info("Statistical test results not found.")
 
 with col_s2:
-    st.subheader("Top Worst Prediction Days")
-    worst_path = DIAG_DIR / "worst_days.csv"
-    if worst_path.exists():
-        st.dataframe(pd.read_csv(worst_path), use_container_width=True)
-    else:
-        st.info("Worst days log not found.")
+    with st.expander("🚨 Top Worst Prediction Days", expanded=False):
+        worst_path = DIAG_DIR / "worst_days.csv"
+        if worst_path.exists():
+            st.dataframe(pd.read_csv(worst_path).style.background_gradient(cmap='Reds'), use_container_width=True)
+            st.caption("Dates where the model exhibited the highest absolute errors intuitively.")
+        else:
+            st.info("Worst days log not found.")
+
+st.markdown("""
+<div style="text-align: center; margin-top: 50px; font-size: 14px; color: gray;">
+    <b>Energy Demand Forecasting Pipeline</b> — Built via Open Power System Data (OPSD)
+</div>
+""", unsafe_allow_html=True)
