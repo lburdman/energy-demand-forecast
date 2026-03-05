@@ -81,7 +81,7 @@ def train_random_forest(X_train: pd.DataFrame, y_train: pd.Series, n_estimators:
     return rf
 
 def train_xgboost(X_train: pd.DataFrame, y_train: pd.Series, n_estimators: int = 500, learning_rate: float = 0.05, max_depth: int = 6) -> XGBRegressor:
-    """Trains parameter-optimized XGBoost explicitly built for CUDA environments."""
+    """Trains parameter-optimized XGBoost explicitly built for CPU/GPU environments flexibly."""
     xgb = XGBRegressor(
         n_estimators=n_estimators,
         learning_rate=learning_rate,
@@ -89,8 +89,7 @@ def train_xgboost(X_train: pd.DataFrame, y_train: pd.Series, n_estimators: int =
         subsample=0.8,
         colsample_bytree=0.8,
         random_state=42,
-        tree_method='hist',
-        device='cuda'
+        tree_method='hist'
     )
     xgb.fit(X_train, y_train)
     return xgb

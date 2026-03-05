@@ -1,31 +1,66 @@
-# Energy Demand Forecast
+# ⚡ Energy Demand Forecast
 
-A portfolio-grade time series project forecasting energy demand, utilizing the Open Power System Data (OPSD) dataset for Germany.
+**A portfolio-grade machine learning project implementing a robust 24-hour ahead electricity demand forecasting pipeline using the Open Power System Data (OPSD) for Germany.**
 
-## Google Colab Setup Instructions
+## 📖 What's Inside
 
-This project is built to run entirely inside Google Colab, leveraging Google Drive for data and figure persistent storage.
+The project follows a rigorous, production-like data science workflow documented across 5 standalone Google Colab Notebooks:
+- `notebooks/01_data_exploration.ipynb`: Data Extraction and Exploratory Data Analysis (EDA).
+- `notebooks/02_feature_engineering.ipynb`: Time-series feature engineering (calendar variables, auto-regressive lags, rolling windows).
+- `notebooks/03_modeling.ipynb`: Baseline and advanced model benchmarks (Naive, Ridge Regression, Random Forest, XGBoost).
+- `notebooks/04_interpretability_diagnostics.ipynb`: Global feature importance, cyclical error segmentation, and worst-case isolation.
+- `notebooks/05_statistical_validation.ipynb`: Rigorous 5-fold rolling-origin backtesting, residual analysis (Ljung-Box test), and conformal prediction bounds.
 
-To reproduce this project, please follow these steps:
+Also included is a standalone Streamlit dashboard for interactive evaluation:
+- `dashboard/app.py`: A native Python web app charting the predictions natively against actual bounds with dynamic zooming.
 
-1. **Open Google Colab:** Navigate to [Google Colab](https://colab.research.google.com/) and start a new Notebook or upload the notebooks from this repository.
-2. **Mount Google Drive:** We use Google Drive to save the downloaded dataset and the generated plots/figures. This is handled automatically by the notebooks, but requires you to authenticate.
-3. **Clone the Repository in Colab:**
-   Inside the notebook you will see a cell that clones this repository directly into your Colab environment:
-   ```python
-   !git clone https://github.com/<USERNAME>/energy-demand-forecast.git
-   %cd energy-demand-forecast
+## 🚀 Quickstart
+
+This project is optimized to run seamlessly in **Google Colab** with storage persisting securely on **Google Drive**:
+1. Open [`notebooks/05_statistical_validation.ipynb`](notebooks/05_statistical_validation.ipynb) in Google Colab.
+2. The notebook will automatically guide you to mount your Google Drive.
+3. Run the notebook top-to-bottom. Data is fetched automatically, and the XGBoost model outputs are stored directly in your Drive.
+4. *(Optional)* Run the Streamlit Dashboard locally:
+   ```bash
+   pip install -r requirements.txt
+   streamlit run dashboard/app.py
    ```
-   *Note: Replace `<USERNAME>` with your GitHub username if you fork the repository.*
-4. **Run Notebooks:** 
-   - Open `notebooks/01_data_exploration.ipynb` and run it top-to-bottom for Data Extraction and basic EDA.
-   - Open `notebooks/02_feature_engineering.ipynb` and run it top-to-bottom to build structural models, outputting processed target structures natively matching predictive pipelines natively towards Google Drive parquets.
-   - Open `notebooks/03_modeling.ipynb` to evaluate and compare multiple predictive TS architectures natively producing final residual figures and metric benchmarks systematically back into Google Drive.
-   - Open `notebooks/04_interpretability_diagnostics.ipynb` to natively dive into XGBoost feature drop-off maps natively logging precise bounding logic generating comprehensive worst-case analytics automatically sent back towards Google Drive.
-   - Open `notebooks/05_statistical_validation.ipynb` to execute rolling-origin backtesting, analyze residual distributions, compute sequence stationarity statistically, map error segments, and calculate conformal prediction limits bounding uncertainty efficiently inside Drive properties.
 
-## Data and Figures Storage
+## 📊 Key Results Preview
 
-- Data and results will be stored dynamically in your Google Drive at the path `/content/drive/MyDrive/energy-demand-forecast`.
-- Raw data will be downloaded to `data/raw/` inside the Drive root if it doesn't already exist.
-- Generated figures are automatically saved as PNGs under `results/figures/` in the same Drive root.
+Tree-based architectures significantly outperformed baseline and linear models effectively. XGBoost was selected structurally for optimal accuracy and cyclic mapping performance across stable 5-fold rolling-origin backtesting metrics.
+
+| Model        | Avg RMSE (MW) | Avg MAE (MW) | Avg MAPE (%) |
+|--------------|---------------|--------------|--------------|
+| Naive      | High          | High         | High         |
+| Ridge        | Medium        | Medium       | Medium       |
+| RF           | Low           | Low          | Low          |
+| XGBoost      | Lowest        | Lowest       | Lowest       |
+*(Actual precision limits logged explicitly inside `results/diagnostics/backtest_metrics.csv`)*
+
+### Residual Analysis
+Residual tests (Ljung-Box p-values) validated the core structural stability natively, capturing broad seasonality efficiently while tracking remaining cyclic volatility intuitively mapped across:
+![Prediction Interval Plot](https://github.com/lburdman/energy-demand-forecast/raw/main/results/diagnostics/prediction_interval_plot.png)
+
+## 📁 Folder Structure
+
+```text
+├── README.md
+├── requirements.txt
+├── report/
+│   └── REPORT.md               <-- Concise project paper
+├── dashboard/
+│   └── app.py                  <-- Streamlit exploration tool
+├── notebooks/                  <-- Core Colab steps (01-05)
+└── src/                        
+    ├── data_loader.py          <-- Data ingestion methods
+    ├── diagnostics.py          <-- Core plotting behaviors
+    ├── features.py             <-- Modeling targets
+    ├── models.py               <-- Baseline architectures
+    └── validation.py           <-- Core conformal methods
+```
+
+## ⚖️ License & Attribution
+
+This codebase is provided under the standard MIT License.
+**Data Source:** The dataset natively utilizes the `time_series_60min_singleindex.csv` provided proudly under an open data standard by the [Open Power System Data (OPSD)](https://data.open-power-system-data.org/) consortium.
