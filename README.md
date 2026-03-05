@@ -31,15 +31,15 @@ The models inherently learn that strong daily cycles map the majority of the pre
 Tree models (XGBoost/RF) drastically outperform the Naive baseline and the Ridge regression mapping complex, non-linear interactions accurately across changing conditions safely without over-fitting limitations.
 
 ### 3. Stability Across Rolling-Origin Backtesting
-![Backtest RMSE by Fold](results/diagnostics/backtest_rmse_by_fold.png)
+![Backtest RMSE by Fold](results/figures/backtest_rmse_by_fold.png)
 Using robust rolling-origin validation, we mapped sequential fold tests securely verifying structural accuracy remains completely tight and completely stable without unmapped degradation randomly gracefully.
 
 ### 4. Ramp & Peak Error Concentrations
-![Error by Hour](results/diagnostics/error_by_hour.png)
+![Error by Hour](results/figures/error_by_hour.png)
 Predictive limits mathematically suffer inherently around rapidly shifting peak cycles intuitively demonstrating inherent tracking latency across steep ramp periods logically.
 
 ### 5. Uncertainty Modeling via Conformal Prediction
-![Prediction Interval Plot](results/diagnostics/prediction_interval_plot.png)
+![Prediction Interval Plot](results/figures/prediction_interval_plot.png)
 Residual matrices inherently map heavy-tailed non-Gaussian logic cleanly justifying safe Conformal Prediction interval tracking dynamically outputting an implicit 95% uncertainty scaling logically surrounding limits effectively.
 
 ## 💻 Run the Dashboard
