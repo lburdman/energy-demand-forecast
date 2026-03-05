@@ -21,6 +21,7 @@ To reproduce this project, please follow these steps:
    - Open `notebooks/01_data_exploration.ipynb` and run it top-to-bottom for Data Extraction and basic EDA.
    - Open `notebooks/02_feature_engineering.ipynb` and run it top-to-bottom to build structural models, outputting processed target structures natively matching predictive pipelines natively towards Google Drive parquets.
    - Open `notebooks/03_modeling.ipynb` to evaluate and compare multiple predictive TS architectures natively producing final residual figures and metric benchmarks systematically back into Google Drive.
+   - Open `notebooks/04_interpretability_diagnostics.ipynb` to natively dive into XGBoost feature drop-off maps natively logging precise bounding logic generating comprehensive worst-case analytics automatically sent back towards Google Drive.
 
 ## Data and Figures Storage
 
