@@ -32,9 +32,9 @@ The models inherently learn that strong daily cycles map the majority of the pre
 ### 2. Nonlinearity Outperforms Linear Mapping
 Tree models (XGBoost/RF) drastically outperform the Naive baseline and the Ridge regression mapping complex, non-linear interactions accurately across changing conditions safely without over-fitting limitations.
 
-### 3. Stability Across Rolling-Origin Backtesting
+### 3. Rolling-Origin Backtesting: Accuracy Varies Across Folds
 ![Backtest RMSE by Fold](results/figures/backtest_rmse_by_fold.png)
-Using robust rolling-origin validation, we mapped sequential fold tests securely verifying structural accuracy remains completely tight and completely stable without unmapped degradation randomly gracefully.
+Across five rolling-origin folds, XGBoost RMSE was 3388, 2186, 1307, 1411 and 1271 (mean about 1913). The worst fold is roughly 2.6x the best, so accuracy is not stable across time, while the Naive baseline stays between 8427 and 8787. XGBoost beats the baseline in every fold, but the size of that gain depends on the period. Source: `results/diagnostics/backtest_metrics.csv`.
 
 ### 4. Ramp & Peak Error Concentrations
 ![Error by Hour](results/figures/error_by_hour.png)
@@ -42,7 +42,12 @@ Predictive limits mathematically suffer inherently around rapidly shifting peak 
 
 ### 5. Uncertainty Modeling via Conformal Prediction
 ![Prediction Interval Plot](results/figures/prediction_interval_plot.png)
-Residual matrices inherently map heavy-tailed non-Gaussian logic cleanly justifying safe Conformal Prediction interval tracking dynamically outputting an implicit 95% uncertainty scaling logically surrounding limits effectively.
+Heavy-tailed, non-Gaussian residuals motivate split Conformal Prediction intervals instead of Gaussian ones. The intervals target 95% coverage (alpha = 0.05), but empirical coverage on the test set is **80.69%**, well below nominal. See Limitations below.
+
+## ⚠️ Limitations
+- **Fold variance:** XGBoost RMSE ranges from 1271 to 3388 across backtest folds (about 2.6x), so a single headline error figure overstates how consistent the model is.
+- **Conformal under-coverage:** the nominal 95% intervals cover only 80.7% of test points. Split conformal guarantees assume exchangeable residuals; hourly residuals are ordered in time and autocorrelated (Ljung-Box at 24 lags, p = 0.0), so that assumption does not hold and the guarantee does not carry over.
+- **Missing exogenous drivers:** the only exogenous inputs are German solar and wind generation. No weather (e.g. temperature) or public-holiday features are used, which is consistent with the residual autocorrelation above.
 
 ## 💻 Run the Dashboard
 A fast native Python web application charting the predictions interactively!

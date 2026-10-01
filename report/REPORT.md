@@ -19,7 +19,9 @@ We assess out-of-sample models using standard error limits:
 ## 4. Rolling-Origin Validation
 Unlike random $K$-fold splits, **rolling-origin validation** iteratively trains models up to time $T_k$ and evaluates strictly over the forward window $[T_k, T_{k+W}]$ natively. This mathematically protects against look-ahead temporal leakage systematically matching real-world operational deployments gracefully.
 
-![Rolling-Origin Stability](../results/figures/backtest_rmse_by_fold.png)
+![Rolling-Origin RMSE by Fold](../results/figures/backtest_rmse_by_fold.png)
+
+Across five folds, XGBoost RMSE was 3388, 2186, 1307, 1411 and 1271. The worst fold is roughly 2.6x the best, so out-of-sample accuracy varies materially over time, while the Naive baseline stays between 8427 and 8787.
 
 ## 5. Residual Diagnostics
 Model residuals ($e_t = y_t - \hat{y}_t$) represent the uncaptured signal within our targets intrinsically. If a model performs perfectly systematically, residuals should resemble a strict Gaussian White Noise sequence cleanly.
@@ -42,7 +44,7 @@ To explicitly map model uncertainty mathematically accurately, we employ **Confo
 3. Formulate the explicit Prediction Interval dynamically: 
    $$ PI = [\hat{y}_{test} - q, \hat{y}_{test} + q] $$
 
-This process fundamentally guarantees that actual targets logically enter the bounded interval accurately $(1-\alpha)\%$ of the duration implicitly.
+Under exchangeability, this procedure guarantees $(1-\alpha)$ marginal coverage. In this project $\alpha = 0.05$ (95% nominal), but empirical test coverage is **80.69%**. Hourly residuals are ordered in time and autocorrelated (Ljung-Box, 24 lags, p = 0.0), so the exchangeability assumption fails and the nominal guarantee does not hold.
 ![Prediction Interval Plot](../results/figures/prediction_interval_plot.png)
 
 ## 7. Key Statistical Insights
@@ -53,6 +55,11 @@ This process fundamentally guarantees that actual targets logically enter the bo
 5. **Residuals exhibit heavy tails, indicating extreme demand events:** Non-Gaussian spreads consistently prove that outliers naturally escape traditional tree mapping selectively forming unpredictable spikes intuitively smoothly.
 
 ## 8. Limitations & Future Work
+Current limitations:
+- **Fold variance:** XGBoost RMSE ranges from 1271 to 3388 across backtest folds (about 2.6x).
+- **Conformal under-coverage:** 80.7% empirical coverage against a 95% target, because time-ordered, autocorrelated residuals violate exchangeability.
+- **No weather or holiday features:** the only exogenous inputs are German solar and wind generation.
+
 We intend to extend fundamental inputs structurally driving correlation limits further effectively:
 - Formulating a distinct Holiday Calendar explicitly mapping distinct cycle-breaks gracefully mapping out standard cyclical behaviors successfully logically.
 - Expanding into deep probabilistic structures evaluating true **Quantile Regression** architectures mapping asymmetric penalizations perfectly accurately gracefully.
